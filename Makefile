@@ -29,7 +29,7 @@ canboatbinaries: canboat
 	cp $(WS)/canboat/rel/$(PLATFORM)/* bin/
 
 bin/candump:
-	apt install can-utils
+	sudo apt install can-utils
 	cp /usr/bin/candump bin/
 
 module.tar.gz: bin/viamboatmodule bin/candump canboatbinaries start.sh
