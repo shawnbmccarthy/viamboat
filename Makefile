@@ -1,3 +1,5 @@
+WS=./canboat_workspace
+PLATFORM=$(shell uname | tr '[A-Z]' '[a-z]')-$(shell uname -m)
 
 bin/viamboatmodule: go.mod *.go cmd/module/*.go
 	go build -o bin/viamboatmodule cmd/module/cmd.go
@@ -18,17 +20,19 @@ updaterdk:
 test:
 	go test
 
+canboat:
+	mkdir -p $(WS)
+	@cd $(WS); git clone https://github.com/canboat/canboat.git
+	@cd $(WS)/canboat; make
+
+canboatbinaries: canboat
+	cp $(WS)/canboat/rel/$(PLATFORM)/* bin/
+
 bin/candump:
+	apt install can-utils
 	cp /usr/bin/candump bin/
 
-bin/analyzer:
-	cp /usr/local/bin/analyzer bin/
-
-bin/candump2analyzer:
-	cp /usr/local/bin/candump2analyzer bin/
-
-
-module.tar.gz: bin/viamboatmodule bin/candump bin/candump2analyzer bin/analyzer start.sh
+module.tar.gz: bin/viamboatmodule bin/candump canboatbinaries start.sh
 	tar czf $@ $^
 
 module: module.tar.gz
